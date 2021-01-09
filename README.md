@@ -26,12 +26,12 @@
     - Para isso é necessário habilitar o acesso "menos seguro" por usuário e senha em alguma conta: (https://support.google.com/accounts/answer/6010255)
  - Configurar as variaveis de ambiente conforme (https://github.com/guilhermecgs/ir/blob/master/tests/test_environment_variables.py)
  - Executar os comandos abaixo:
-    - # Checa se a configuração das variáveis de ambiente estão corretas.
-      python ./ir.py --do check_environment_variables
-    - # Faz a busca no CEI e envia o arquivo de registros ao dropbox
-      python ./ir.py --do busca_trades_e_faz_merge_operacoes
-    - # Realiza os calculos e envia o email
-      python ./ir.py --do calculo_ir
+    - Checa se a configuração das variáveis de ambiente estão corretas.\
+      `python ./ir.py --do check_environment_variables`
+    - Faz a busca no CEI e envia o arquivo de registros ao dropbox\
+      `python ./ir.py --do busca_trades_e_faz_merge_operacoes`
+    - Realiza os calculos e envia o email\
+      `python ./ir.py --do calculo_ir`
 
 ## exemplo do relatorio gerado no seu email
 https://github.com/guilhermecgs/ir/blob/master/exemplo_relatorio_automatico.pdf
