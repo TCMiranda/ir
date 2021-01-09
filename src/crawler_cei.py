@@ -4,15 +4,15 @@ import pandas as pd
 from bs4 import BeautifulSoup
 
 from selenium import webdriver
-import chromedriver_binary  # do not remove
-from selenium.common.exceptions import NoSuchElementException
 
+import chromedriver_binary  # do not remove
+from src.driver_selenium import ChromeDriver
+
+from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from src.driver_selenium import ChromeDriver
-
 
 class AnyEc:
     """ Use with WebDriverWait to combine expected_conditions
@@ -137,18 +137,39 @@ class CrawlerCei():
 
                 dfs_to_concat.append(self.__converte_trades_para_dataframe())
                 consultar_click(self.driver)
-                WebDriverWait(self.driver, 60).until(exists_and_not_disabled(self.id_selecao_corretoras))
+                try:
+                    WebDriverWait(self.driver, 60).until(exists_and_not_disabled(self.id_selecao_corretoras))
+                except:
+                    print(r'Error: ' + str(i), end='\n')
+                    pass
+        
+        # Allow retry during selenium exceptions
+        def __tentativa__busca_trades_de_uma_corretora(i, attempt = 0, maxAttempts=5):
+            attemptLog = (r' (' + str(attempt) + ')') if attempt > 0 else r''
+            workLog = r'Working... [' + str(i) + r' / ' + str(ddlAgentesLen) + r']'
+            print(workLog + attemptLog, end='\r')
+            
+            try:
+                __busca_trades_de_uma_corretora(i)
+            except StaleElementReferenceException:
+                __tentativa__busca_trades_de_uma_corretora(i, attempt + 1, maxAttempts)
+            except:
+                raise
+            print()
 
         if len(ddlAgentes.options) == 1:
             __busca_trades_de_uma_corretora(0)
         else:
-            for i in range(1, len(ddlAgentes.options)):
-                __busca_trades_de_uma_corretora(i)
+            ddlAgentesLen = len(ddlAgentes.options)
+            for i in range(1, ddlAgentesLen):
+                
+                __tentativa__busca_trades_de_uma_corretora(i)
 
         if len(dfs_to_concat):
             return pd.concat(dfs_to_concat)
         else:
             return pd.DataFrame(columns=self.__colunas_df_cei)
+
 
     def __converte_trades_para_dataframe(self):
 

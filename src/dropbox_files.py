@@ -4,10 +4,16 @@ from dropbox import files
 
 OPERATIONS_FILEPATH = 'export_operacoes.txt'
 
-
 def download_dropbox_file():
     dbx = dropbox.Dropbox(os.environ['DROPBOX_API_KEY'])
-    dbx.files_download_to_file(OPERATIONS_FILEPATH, os.environ['DROPBOX_FILE_LOCATION'])
+    # Do not raise if the file is initially empty
+    try:
+        dbx.files_download_to_file(OPERATIONS_FILEPATH, os.environ['DROPBOX_FILE_LOCATION'])
+    except dropbox.exceptions.ApiError:
+        pass
+    except:
+        raise
+
     try:
         dbx._session.close()
     except:
