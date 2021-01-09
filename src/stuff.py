@@ -85,7 +85,8 @@ def calcula_custodia(df, data=None):
                 
                 # Tmp. fix to calculate the sale of an option without having it on custody
                 try:
-                    # if preco_atual is None: preco_atual = 0
+                    if preco_atual is None:
+                        preco_atual = 0
                     valor = preco_atual * qtd_em_custodia
                 except:
                     valor = 0
@@ -139,7 +140,7 @@ def calcula_precos_medio_de_compra(df, data=None):
 
         df_ticker['cum_qtd_anterior'] = df_ticker['cum_qtd'].shift(1, fill_value=0)
         df_ticker['preco_medio'] = np.nan
-        
+
         for i, row in df_ticker.iterrows():
             if row['qtd_ajustada'] > 0:
                 preco_medio_atual = df_ticker['preco_medio'].shift(1, fill_value=df_ticker['preco'].iloc[0])[i]
